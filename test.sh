@@ -5,9 +5,11 @@ for r in $rs
 do
     for size in $target
     do
-        echo $r $size
-        python test/gpt2.py --r $r --size $size > "test/results/${r}_${size}.txt"
+        res=`python test/gpt2.py --r $r --size $size`
+        echo ${r}_${size}, ${res}
+        echo ${res} > "test/results/${r}_${size}.txt"
     done
-    echo $r gptj
-    python test/gptj.py --r $r > "test/results/${r}_gptj.txt"
+    res=`python test/gptj.py --r $r`
+    echo ${r}_gptj, ${res}
+    echo ${res} > "test/results/${r}_gptj.txt"
 done
