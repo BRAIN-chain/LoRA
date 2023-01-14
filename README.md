@@ -1,9 +1,13 @@
-# LoRA
+# LoRA-GPT-J
 
-[LoRA](https://github.com/microsoft/LoRA) implementation.
+[LoRA](https://github.com/microsoft/LoRA) implementations for GPT-J and GPT-2.
 
+In source code,
 - Change `float32` to `float16` if needed.
 - Change `cpu` to `cuda` if available.
+- Change `adapter_dim` if needed.
+
+FYI, The official GPT-2 LoRA implementation: [microsoft/LoRA](https://github.com/microsoft/LoRA)
 
 # How to Use
 
@@ -65,5 +69,5 @@ Adapters Saved:                 69733529
 # References
 
 - [GPT-J 6B](https://huggingface.co/EleutherAI/gpt-j-6B)
-- [LoRA](https://github.com/microsoft/LoRA)
+- [microsoft/LoRA](https://github.com/microsoft/LoRA) Also you can see RoBERTa and DeBERTa implementations.
 - [Frozen Layers](https://colab.research.google.com/drive/1ft6wQU0BhqG5PRlwgaZJv2VukKKjU4Es?usp=sharing#scrollTo=aIlHG9Wk0WaJ)

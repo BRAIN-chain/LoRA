@@ -122,7 +122,7 @@ def set_adapters(model, adapters):
     return adapters
 
 
-def add_adapters(model, adapter_dim=16):
+def add_adapters(model, adapter_dim=4):
     assert adapter_dim > 0
 
     for module in model.modules():
@@ -150,24 +150,3 @@ def add_adapters(model, adapter_dim=16):
                 ),
             )
             nn.init.zeros_(module.adapter[1].weight)
-
-
-"""Utils"""
-
-
-def count_trainable_parameters(model):
-    return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
-
-def count_parameters(model):
-    return sum(p.numel() for p in model.parameters())
-
-
-def count_buffers(model):
-    return sum(p.numel() for p in model.buffers())
-
-
-def summary(model):
-    print(f"- # of           params:\t{count_parameters(model)}")
-    print(f"- # of trainable params:\t{count_trainable_parameters(model)}")
-    print(f"- # of          buffers:\t{count_buffers(model)}")
