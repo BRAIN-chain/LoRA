@@ -90,9 +90,12 @@ if __name__ == "__main__":
     # print(f"\nAdapters Saved:\t\t\t{os.path.getsize(ADAPTER_PATH)}")
 
     # save
+    model_ntp = 6050882784
+    model_bs = 24207819307
+    lora_ntp = count_trainable_parameters(model)
+    lora_bs = os.path.getsize(ADAPTER_PATH)
     print(
-        count_trainable_parameters(model),
-        os.path.getsize(ADAPTER_PATH)
+        f"{model_ntp}, {model_bs}, {lora_ntp}, {lora_bs}, {(1-lora_ntp/model_ntp)*100}, {(1-lora_bs/model_bs)*100}"
     )
 
 """

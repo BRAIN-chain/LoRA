@@ -21,6 +21,20 @@ ADAPTER_PATH = f"{PATH}/{NAME_SIZE}.pt"
 R = args.r
 
 
+if args.size == "gpt2":
+    MODEL_NTP = 124439808
+    MODEL_BS = 548118077
+elif args.size == "gpt2-medium":
+    MODEL_NTP = 354823168
+    MODEL_BS = 1520013706
+elif args.size == "gpt2-large":
+    MODEL_NTP = 774030080
+    MODEL_BS = 3247202234
+elif args.size == "gpt2-xl":
+    MODEL_NTP = 1557611200
+    MODEL_BS = 6431878936
+
+    
 if __name__ == "__main__":
     """Load Default Model"""
 
@@ -87,9 +101,12 @@ if __name__ == "__main__":
     # print(f"\nAdapters Saved:\t\t\t{os.path.getsize(ADAPTER_PATH)}")
 
     # save
+    model_ntp = MODEL_NTP
+    model_bs = MODEL_BS
+    lora_ntp = count_trainable_parameters(model)
+    lora_bs = os.path.getsize(ADAPTER_PATH)
     print(
-        count_trainable_parameters(model),
-        os.path.getsize(ADAPTER_PATH)
+        f"{model_ntp}, {model_bs}, {lora_ntp}, {lora_bs}, {(1-lora_ntp/model_ntp)*100}, {(1-lora_bs/model_bs)*100}"
     )
 
 """
