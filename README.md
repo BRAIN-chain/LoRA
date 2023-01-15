@@ -1,4 +1,6 @@
-# LoRA-GPT-J
+# Small-Scale Matrices
+
+# LoRA Library for GPT-J and GPT-2
 
 [LoRA](https://github.com/microsoft/LoRA) implementations for GPT-J and GPT-2.
 
