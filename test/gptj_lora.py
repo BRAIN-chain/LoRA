@@ -7,14 +7,13 @@ from utils import *
 
 
 import argparse
-
 parser = argparse.ArgumentParser(description='Hyperparameters')
 parser.add_argument('--r', metavar='R', type=int, required=True, help='low rank r')
 args = parser.parse_args()
 # print(args)
 
 
-PATH = "test/adapters"
+PATH = "test/adapters/lora"
 ADAPTER_PATH = f"{PATH}/gptj.pt"
 R = args.r
 
@@ -69,7 +68,6 @@ if __name__ == "__main__":
     ).to(device='cpu', non_blocking=True)
     # _ = model.eval()  # by default
     # print("Model Loaded.")
-
     # print("\nDefault Model")
     # summary(model)
 
@@ -81,11 +79,10 @@ if __name__ == "__main__":
 
     lora.add_adapters(model, adapter_dim=R)
     model.to(device='cpu', non_blocking=True)
-
     # print(model)
     # print("\nLoRA-applied Model")
     # summary(model)
-
+    # print(lora.get_adapters(model))
     torch.save(lora.get_adapters(model), ADAPTER_PATH)
     # print(f"\nAdapters Saved:\t\t\t{os.path.getsize(ADAPTER_PATH)}")
 
