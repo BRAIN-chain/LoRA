@@ -119,13 +119,10 @@ def get_sparsity_info(model) -> dict:
     for module in model.modules():
         if isinstance(module, FrozenLinear):
             # print("Linear", module.adapter)
-            adapter = copy.deepcopy(module.adapter)
-            _ = adapter.eval()
-
             total_sum_weights = 0
             total_numel = 0
-            for module in adapter.children():
-                weight = module.weight.detach()
+            for adapter_module in module.adapter.children():
+                weight = adapter_module.weight.detach()
                 sparsity = torch.sum(weight == 0) / weight.numel()
                 # print(f'Sparsity in Linear{linears}: {sparsity.item():.2%}')
                 total_sum_weights += torch.sum(weight == 0)
@@ -136,13 +133,10 @@ def get_sparsity_info(model) -> dict:
 
         elif isinstance(module, FrozenEmbedding):
             # print("Embedding", module.adapter)
-            adapter = copy.deepcopy(module.adapter)
-            _ = adapter.eval()
-
             total_sum_weights = 0
             total_numel = 0
-            for module in adapter.children():
-                weight = module.weight.detach()
+            for adapter_module in module.adapter.children():
+                weight = adapter_module.weight.detach()
                 sparsity = torch.sum(weight == 0) / weight.numel()
                 # print(f'Sparsity in Embedding{embeddings}: {sparsity.item():.2%}')
                 total_sum_weights += torch.sum(weight == 0)
@@ -277,20 +271,81 @@ def add_adapters(
             # 3) Global
             # TODO
 
-            # TODO: permanently remove pruned parameters
-            prune.remove(module, 'weight')
+            # # TODO: permanently remove pruned parameters
+            # prune.remove(module, 'weight')
 
-    # print(theta_0['Linear168'][1].weight)  # requires_grad  # grad_fn
-    # print(theta_j['Linear168'][1].weight)  # requires_grad  # grad_fn
-    # print(prune_j['Linear168'][1].weight)  # requires_grad  # grad_fn
+    # print("theta_0: 0", theta_0['Linear168'][0].weight)  # requires_grad  # grad_fn
+    # print("theta_0: 1", theta_0['Linear168'][1].weight)  # requires_grad  # grad_fn
+    # print("theta_j: 0", theta_j['Linear168'][0].weight)  # requires_grad  # grad_fn
+    # print("theta_j: 1", theta_j['Linear168'][1].weight)  # requires_grad  # grad_fn
+    # print("prune_j: 0", prune_j['Linear168'][0].weight)  # requires_grad  # grad_fn
+    # print("prune_j: 1", prune_j['Linear168'][1].weight)  # requires_grad  # grad_fn
 
     # [3] Initialize network with theta_0
     # set mask into module.adapter
     # print(get_adapters(model)['Linear168'][1].weight)  # requires_grad  # grad_fn
-    set_adapters(model, prune_j)
-    # print(get_adapters(model)['Linear168'][1].weight)  # requires_grad  # grad_fn
+    prune_theta_0 = theta_0
+    for t0, pj in zip(prune_theta_0.items(), prune_j.items()):
+        (t0_name, t0_adapter) = t0
+        (tj_name, tj_adapter) = pj
+        for t0_module, pj_module in zip(t0_adapter.children(), tj_adapter.children()):
+            # print(next(t0_module.parameters()).device)
+            # print(next(pj_module.parameters()).device)
+            pj_module.to('cpu')
+            mask = pj_module.weight_mask
+            prune.custom_from_mask(t0_module, name="weight", mask=mask)
+
+    set_adapters(model, prune_theta_0)
+
+    # print("model  : 0", get_adapters(model)['Linear168'][0].weight)  # requires_grad  # grad_fn
+    # print("model  : 1", get_adapters(model)['Linear168'][1].weight)  # requires_grad  # grad_fn
+    # print(get_adapters(model)['Linear168'][0].weight.requires_grad)  # requires_grad  # grad_fn
     # print(get_adapters(model)['Linear168'][1].weight.requires_grad)  # requires_grad  # grad_fn
+    # print(get_adapters(model)['Linear168'][0].weight.grad_fn)  # requires_grad  # grad_fn
     # print(get_adapters(model)['Linear168'][1].weight.grad_fn)  # requires_grad  # grad_fn
+
+    # # for test
+    # model.train()
+    # model.to(device, non_blocking=True)
+    
+    # model.train()
+    # model.to(device, non_blocking=True)
+    # for epoch in range(1, j+1):
+    #     # model.gradient_checkpointing_enable()
+
+    #     # use the parameters from Appendix D.4, Table 11,12 and 15 at https://arxiv.org/pdf/2106.09685.pdf
+    #     # adjust eps for FP16 (1e-8 => 1e-4)
+    #     optimizer = optim.AdamW(
+    #         model.parameters(), lr=2e-4, weight_decay=0.1, eps=1e-4
+    #     )
+
+    #     with torch.cuda.amp.autocast():
+    #         for row in (pbar := tqdm(train_dataset)):
+    #             if len(row["dialogue"]) <= 1:
+    #                 continue
+
+    #             batch = tokenizer(
+    #                 row["dialogue"], truncation=True, max_length=2048, return_tensors='pt'
+    #             )
+    #             batch = {k: v.to(device) for k, v in batch.items()}
+
+    #             optimizer.zero_grad()
+    #             out = model.forward(**batch,)
+    #             loss = F.cross_entropy(
+    #                 out.logits[:, :-1, :].flatten(0, -2),
+    #                 batch['input_ids'][:, 1:].flatten(),
+    #                 reduction='mean'
+    #             )
+    #             pbar.set_description(f"loss {loss:.4f}")  # TODO: disable
+    #             loss.backward()
+    #             optimizer.step()
+
+    #     # Print the statistics of the epoch
+    #     # TODO: train_loss, val_loss, val_accuracy
+    #     print('Completed training batch', epoch)
+
+    # # print("model_j: 0", get_adapters(model)['Linear168'][0].weight)  # requires_grad  # grad_fn
+    # # print("model_j: 1", get_adapters(model)['Linear168'][1].weight)  # requires_grad  # grad_fn
 
     model.to('cpu')
     model.eval()
