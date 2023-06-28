@@ -24,12 +24,13 @@ class FrozenConv1D(nn.Module):
         self.bias = bias
         
     def forward(self, x):
+        x1 = x.clone()
         # with torch.no_grad():
         size_out = x.size()[:-1] + (self.nf,)
         x = torch.addmm(self.bias, x.view(-1, x.size(-1)), self.weight)
-        output = x.view(size_out)
+        output = x.view(*size_out)        
         if self.adapter:
-            output += self.adapter(input)
+            output += self.adapter(x1)
         return output
 
     @classmethod
