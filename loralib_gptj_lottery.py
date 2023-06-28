@@ -122,7 +122,7 @@ def get_sparsity_info(model) -> dict:
             total_sum_weights = 0
             total_numel = 0
             for adapter_module in module.adapter.children():
-                weight = adapter_module.weight.detach()
+                weight = adapter_module.weight_mask.detach()
                 sparsity = torch.sum(weight == 0) / weight.numel()
                 # print(f'Sparsity in Linear{linears}: {sparsity.item():.2%}')
                 total_sum_weights += torch.sum(weight == 0)
@@ -136,7 +136,7 @@ def get_sparsity_info(model) -> dict:
             total_sum_weights = 0
             total_numel = 0
             for adapter_module in module.adapter.children():
-                weight = adapter_module.weight.detach()
+                weight = adapter_module.weight_mask.detach()
                 sparsity = torch.sum(weight == 0) / weight.numel()
                 # print(f'Sparsity in Embedding{embeddings}: {sparsity.item():.2%}')
                 total_sum_weights += torch.sum(weight == 0)
