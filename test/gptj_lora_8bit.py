@@ -30,18 +30,18 @@ if __name__ == "__main__":
     import transformers
     from transformers import GPTJForCausalLM
 
-    config = transformers.GPTJConfig.from_pretrained("EleutherAI/gpt-j-6B")
-    tokenizer = transformers.AutoTokenizer.from_pretrained("EleutherAI/gpt-j-6B")
-    tokenizer.add_special_tokens({'pad_token': tokenizer.eos_token})
-    model = GPTJForCausalLM.from_pretrained(
-        "EleutherAI/gpt-j-6B", revision="float32",
-        torch_dtype=torch.float32, low_cpu_mem_usage=True
-    ).to(device='cpu', non_blocking=True)
-    # _ = model.eval()  # by default
-    # print("Model Loaded.")
+    # config = transformers.GPTJConfig.from_pretrained("EleutherAI/gpt-j-6B")
+    # tokenizer = transformers.AutoTokenizer.from_pretrained("EleutherAI/gpt-j-6B")
+    # tokenizer.add_special_tokens({'pad_token': tokenizer.eos_token})
+    # model = GPTJForCausalLM.from_pretrained(
+    #     "EleutherAI/gpt-j-6B", revision="float32",
+    #     torch_dtype=torch.float32, low_cpu_mem_usage=True
+    # ).to(device='cpu', non_blocking=True)
+    # # _ = model.eval()  # by default
+    # # print("Model Loaded.")
 
-    # print("\nDefault Model")
-    # summary(model)
+    # # print("\nDefault Model")
+    # # summary(model)
 
     """LoRA-applied Model"""
 
